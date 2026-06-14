@@ -1,5 +1,7 @@
 # 企業情報自動クローラー（スクレイピングツール）
 
+[![CI](https://github.com/takahashi-keisuke-b/scraping_company_info/actions/workflows/CI.yml/badge.svg)](https://github.com/takahashi-keisuke-b/scraping_company_info/actions/workflows/CI.yml)
+
 ターゲットとなる企業サイトのURLを入力するだけで、サイト内を自律的に巡回（クローリング）し、会社概要ページから自動で企業情報を抽出するPythonアプリケーションです。
 
 実務での保守性・拡張性を意識し、クリーンアーキテクチャ（レイヤードアーキテクチャ）およびドメイン駆動設計（DDD）の思想を取り入れて強固に設計しています。
