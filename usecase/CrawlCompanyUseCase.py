@@ -45,7 +45,7 @@ class CrawlCompanyUseCase:
 
                 if not result_company.is_success:
                     print(f"{self.log_tag}| extract_company_from_dl")
-                    result_company: Result[Company] = mapper.extract_company_from_dl()
+                    result_company = mapper.extract_company_from_dl()
 
                 if result_company.is_success and not result_company.value is None and not result_company.value.name == "":
                     return Result[tuple[Company, Url]].success((result_company.value,current_url))
