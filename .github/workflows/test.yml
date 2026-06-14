@@ -1,0 +1,43 @@
+# 1. ワークフロー（自動化処理）の名前
+name: Python Code Quality Check
+
+# 2. どんな操作が起きたときにこのロボットを動かすかの設定
+on:
+  push:
+    branches: [ "main" ] # mainブランチに手動同期（push）されたときだけ動く
+
+# 3. ロボットが実行する具体的な仕事（ジョブ）の中身
+jobs:
+  lint-and-test:
+    # 仮想空間のまっさらなパソコン（Linux Ubuntu）を1台レンタルする
+    runs-on: ubuntu-latest
+
+    steps:
+    # (Step 1) あなたがプッシュしたコードを、レンタルしたパソコンにダウンロードする
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    # (Step 2) そのパソコンに Python 3.10 の環境を自動インストールする
+    - name: Set up Python 3.10
+      uses: actions/actions-setup-python@v5
+      with:
+        python-version: "3.10"
+
+    # (Step 3) 構文チェックや型チェックに必要なツールをインストールする
+    - name: Install Linting Tools
+      run: |
+        python -m pip upgrade pip
+        pip install flake8 mypy
+
+    # (Step 4) flake8 というツールを使って、コードに致命的な構文エラーがないか自動査定する
+    - name: Lint with flake8
+      run: |
+        # 構文エラーや未定義の変数など、動かした瞬間にクラッシュするような致命的なバグを検知
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    # (Step 5) mypy というツールを使って、型定義（型ヒント）が壊れていないか自動査定する
+    - name: Type check with mypy
+      run: |
+        # あなたがドメイン層などで綺麗に書いている「型ヒント」が論理的に矛盾していないかチェック
+        # 依存ライブラリの型定義がない警告は無視するオプションを付与
+        mypy . --ignore-missing-imports
