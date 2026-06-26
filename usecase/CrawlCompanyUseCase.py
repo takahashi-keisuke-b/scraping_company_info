@@ -13,7 +13,7 @@ class CrawlCompanyUseCase:
         self.visited_urls: set[Url] = set()
         self.queue: list[tuple[Url, int]] = []
 
-    def execute(self, start_url: Url) -> Result[tuple[Company, Url]]:
+    def execute(self, start_url: Url) -> Result[Company]:
         print(f"{self.log_tag}| crawl start")
 
         self.queue.append((start_url,0))
@@ -47,8 +47,16 @@ class CrawlCompanyUseCase:
                     print(f"{self.log_tag}| extract_company_from_dl")
                     result_company = mapper.extract_company_from_dl()
 
-                if result_company.is_success and not result_company.value is None and not result_company.value.name == "":
-                    return Result[tuple[Company, Url]].success((result_company.value,current_url))
+                if not result_company.is_success:
+                    print(f"{self.log_tag}| extract_company_from_flexible")
+                    result_company = mapper.extract_company_from_flexible()
+
+                if not result_company.is_success:
+                    print(f"{self.log_tag}| extract_company_from_bottom")
+                    result_company = mapper.extract_company_from_bottom()
+
+                if result_company.is_success and not result_company.value is None and not result_company.value.name.value == "":
+                    return result_company
                 
                 print(f"{self.log_tag}| score_urls_high_precision")
                 res_url_scores: Result[list[tuple[Url, int]]] = mapper.score_urls_high_precision(current_url)
@@ -64,6 +72,6 @@ class CrawlCompanyUseCase:
             except Exception as e:
                 print(f"Error: {e}")
                 continue
-        return Result[tuple[Company,Url]].not_found()
+        return Result[Company].not_found()
 
 

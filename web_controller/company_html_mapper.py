@@ -1,5 +1,8 @@
+import re
+
 from domain.Company import Company
 from domain.Url import Url
+from domain.SourceValue import SourceValue
 from web_controller.base_html_mapper import BaseHtmlMapper
 from config.Company_Key import COMPANY_KEYWORDS, COMPANY_FIELD_KEYWORDS
 from urllib.parse import urlparse
@@ -49,76 +52,103 @@ class CompanyHtmlMapper(BaseHtmlMapper):
         url_scores_list = list(url_scores_dict.items())
         return Result[list[tuple[Url, int]]].success(url_scores_list)
     
-    def extract_company_from_table(self) -> Result[Company]:
-        matrix_result = self.table_to_limit_matrix()
-        if not matrix_result.is_success or not matrix_result.value:
-            return Result[Company].not_found()
-
-        matrix = matrix_result.value
-
+    def _clean_label(self, label: str) -> str:
+        if not label:
+            return ""
+        
+        # 1. 全角・半角スペース、タブ、改行をすべて除去
+        text = re.sub(r"\s+", "", label)
+        
+        noise_chars = ["：", ":", "【", "】", "■", "◆", "▲", "▼", "●", "★", "[", "]", "(", ")", "（", "）"]
+        for char in noise_chars:
+            text = text.replace(char, "")
+            
+        return text.strip()
+    
+    def _matrix_to_company(self, matrix:list[list[str]]) -> Company:
+        url: Url = self.html.url
+        
         extracted: dict[str, str] = {}
-
+        
         for row in matrix:
             if len(row) < 2:
                 continue
             
-            label = row[0].strip()
-            value = row[1].strip()
+            label = self._clean_label(row[0])
+            value = " ".join(item.strip() for item in row[1:])
 
             for field, keywords in COMPANY_FIELD_KEYWORDS.items():
                 if any(k in label for k in keywords):
                     extracted[field] = value
                     break
 
-        if not extracted.get("name"):
-            return Result[Company].not_found()
-
         result_company: Company = Company.create(
-            name=extracted.get("name", ""),
-            phone=extracted.get("phone", ""),
-            email=extracted.get("email", ""),
-            address=extracted.get("address", ""),
-            representative=extracted.get("representative",""),
-            capital=extracted.get("capital",""),
-            employees=extracted.get("employees",""),
+            name=SourceValue(extracted.get("name", ""), url),
+            phone=SourceValue(extracted.get("phone", ""), url),
+            address=SourceValue(extracted.get("address", ""), url),
+            email=SourceValue(extracted.get("email", ""), url),
+            representative=SourceValue(extracted.get("representative", ""), url),
+            capital=SourceValue(extracted.get("capital", ""), url),
+            employees=SourceValue(extracted.get("employees", ""), url)
             )
+        return result_company
 
-        return Result[Company].success(result_company)
+    def extract_company_from_table(self) -> Result[Company]:
+        matrix_result = self.table_to_matrix()
+        if not matrix_result.is_success or not matrix_result.value:
+            return Result[Company].not_found()
+        matrix = matrix_result.value
+
+        company = self._matrix_to_company(matrix)
+        
+        # 企業名が空白なら失敗
+        if company.name.value == "":
+            return Result[Company].not_found()
+        
+        return Result[Company].success(company)
+    
     
     def extract_company_from_dl(self) -> Result[Company]:
         matrix_result = self.dl_to_matrix()
         if not matrix_result.is_success or not matrix_result.value:
             return Result[Company].not_found()
-
         matrix = matrix_result.value
 
-        extracted: dict[str, str] = {}
-
-        for row in matrix:
-            if len(row) < 2:
-                continue
-            
-            label = row[0].strip()
-            value = row[1].strip()
-
-            for field, keywords in COMPANY_FIELD_KEYWORDS.items():
-                if any(k in label for k in keywords):
-                    extracted[field] = value
-                    break
-
-        if not extracted.get("name"):
+        company = self._matrix_to_company(matrix)
+        
+        # 企業名が空白なら失敗
+        if company.name.value == "":
             return Result[Company].not_found()
+        
+        return Result[Company].success(company)
+    
 
-        result_company: Company = Company.create(
-            name=extracted.get("name", ""),
-            phone=extracted.get("phone", ""),
-            email=extracted.get("email", ""),
-            address=extracted.get("address", ""),
-            representative=extracted.get("representative",""),
-            capital=extracted.get("capital",""),
-            employees=extracted.get("employees",""),
-            )
+    def extract_company_from_flexible(self) -> Result[Company]:
+        matrix_result = self.flexible_block_to_matrix()
+        if not matrix_result.is_success or not matrix_result.value:
+            return Result[Company].not_found()
+        matrix = matrix_result.value
 
-        return Result[Company].success(result_company)
+        company = self._matrix_to_company(matrix)
+        
+        # 企業名が空白なら失敗
+        if company.name.value == "":
+            return Result[Company].not_found()
+        
+        return Result[Company].success(company)
+    
+    def extract_company_from_bottom(self) -> Result[Company]:
+        matrix_result = self.bottom_up_block_to_matrix()
+        if not matrix_result.is_success or not matrix_result.value:
+            return Result[Company].not_found()
+        matrix = matrix_result.value
+
+        company = self._matrix_to_company(matrix)
+        
+        # 企業名が空白なら失敗
+        if company.name.value == "":
+            return Result[Company].not_found()
+        
+        return Result[Company].success(company)
 
 

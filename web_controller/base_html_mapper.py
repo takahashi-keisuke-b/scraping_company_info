@@ -7,6 +7,7 @@ from domain.Url import Url
 
 class BaseHtmlMapper:
     def __init__(self, html: Html):
+        self.html = html
         self.soup = BeautifulSoup(html.value, "html.parser")
     
     def collect_all_href_with_text(self) -> Result[list[tuple[str,str]]]:
@@ -141,6 +142,69 @@ class BaseHtmlMapper:
                 elif tag_name == "dd":
                     if current_label:
                         matrix.append([current_label, text_content])
+
+        if not matrix:
+            return Result[list[list[str]]].not_found()
+
+        return Result[list[list[str]]].success(matrix)
+    
+    def flexible_block_to_matrix(self) -> Result[list[list[str]]]:
+        matrix: list[list[str]] = []
+
+        for element in self.soup.find_all(["div", "p", "li"]):
+            if not isinstance(element, Tag):
+                continue
+
+            children_texts = [
+                child.get_text(strip=True).replace("：", "").replace(":", "").strip()
+                for child in element.children 
+                if child.get_text(strip=True)
+            ]
+
+            if len(children_texts) >= 2:
+                if children_texts not in matrix:
+                    matrix.append(children_texts)
+        
+        if not matrix:
+            return Result[list[list[str]]].not_found()
+        
+        return Result[list[list[str]]].success(matrix)
+
+
+    def bottom_up_block_to_matrix(self) -> Result[list[list[str]]]:
+        matrix: list[list[str]] = []
+        target_tags = ["div", "li", "p"]
+        
+        for element in self.soup.find_all(target_tags):
+            if not isinstance(element, Tag):
+                continue
+
+            has_inner_target = any(
+                isinstance(child, Tag) and child.name in target_tags 
+                for child in element.children
+            )
+            
+            if has_inner_target:
+                is_first_converge_point = True
+                for child in element.children:
+                    if isinstance(child, Tag) and child.name in target_tags:
+                        child_strings = [s.strip() for s in child.stripped_strings if s.strip()]
+                        if len(child_strings) >= 2:
+                            is_first_converge_point = False
+                            break
+                
+                if not is_first_converge_point:
+                    continue
+
+            strings = [
+                s.replace("：", "").replace(":", "").strip() 
+                for s in element.stripped_strings 
+                if s.strip()
+            ]
+
+            if len(strings) >= 2:
+                if strings not in matrix:
+                    matrix.append(strings)
 
         if not matrix:
             return Result[list[list[str]]].not_found()
