@@ -4,7 +4,7 @@ from domain.Company import Company
 from domain.Url import Url
 from domain.SourceValue import SourceValue
 from web_controller.base_html_mapper import BaseHtmlMapper
-from config.Company_Key import COMPANY_KEYWORDS, COMPANY_FIELD_KEYWORDS
+from config.Key import COMPANY_KEYWORDS, COMPANY_FIELD_KEYWORDS
 from urllib.parse import urlparse
 from util.Result import Result
 
@@ -56,7 +56,6 @@ class CompanyHtmlMapper(BaseHtmlMapper):
         if not label:
             return ""
         
-        # 1. 全角・半角スペース、タブ、改行をすべて除去
         text = re.sub(r"\s+", "", label)
         
         noise_chars = ["：", ":", "【", "】", "■", "◆", "▲", "▼", "●", "★", "[", "]", "(", ")", "（", "）"]

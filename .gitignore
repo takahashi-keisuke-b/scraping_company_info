@@ -220,6 +220,5 @@ __marimo__/
 
 # my ignore
 __pycache__/
-memo.md
 .vscode/
 .example/

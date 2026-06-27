@@ -13,6 +13,9 @@ class CrawlCompanyUseCase:
         self.visited_urls: set[Url] = set()
         self.queue: list[tuple[Url, int]] = []
 
+    # def _check_result_company(self, result: Result[Company]) -> bool:
+
+
     def execute(self, start_url: Url) -> Result[Company]:
         print(f"{self.log_tag}| crawl start")
 
@@ -40,21 +43,27 @@ class CrawlCompanyUseCase:
 
                 mapper: CompanyHtmlMapper = CompanyHtmlMapper(res_html.value)
 
+                # table
                 print(f"{self.log_tag}| extract_company_from_table")
                 result_company: Result[Company] = mapper.extract_company_from_table()
 
+                # dl
                 if not result_company.is_success:
                     print(f"{self.log_tag}| extract_company_from_dl")
                     result_company = mapper.extract_company_from_dl()
 
+                # div, p, li
                 if not result_company.is_success:
                     print(f"{self.log_tag}| extract_company_from_flexible")
                     result_company = mapper.extract_company_from_flexible()
 
+                # div, p, li (bottom up)
                 if not result_company.is_success:
                     print(f"{self.log_tag}| extract_company_from_bottom")
                     result_company = mapper.extract_company_from_bottom()
 
+                # check
+                # 会社名
                 if result_company.is_success and not result_company.value is None and not result_company.value.name.value == "":
                     return result_company
                 

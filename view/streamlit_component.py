@@ -34,8 +34,6 @@ class StreamlitComponent:
         StreamlitComponent.display_source_value("代表者", company.representative.value, company.representative.source)
         StreamlitComponent.display_source_value("資本金", company.capital.value, company.capital.source)
         StreamlitComponent.display_source_value("従業員数", company.employees.value, company.employees.source)
-        StreamlitComponent.display_source_value("トップURL", company.top_url.value, company.top_url)
-        StreamlitComponent.display_source_value("問い合わせURL", company.form_url.value, company.form_url)
 
 
         

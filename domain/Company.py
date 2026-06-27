@@ -11,8 +11,6 @@ class Company:
     representative: SourceValue[str, Url] = SourceValue("", Url.empty())
     capital: SourceValue[str, Url] = SourceValue("", Url.empty())
     employees: SourceValue[str, Url] = SourceValue("", Url.empty())
-    top_url: Url = Url.empty()
-    form_url: Url = Url.empty()
 
     @classmethod
     def create(
@@ -24,8 +22,6 @@ class Company:
         representative: SourceValue[str, Url] = SourceValue("", Url.empty()),
         capital: SourceValue[str, Url] = SourceValue("", Url.empty()),
         employees: SourceValue[str, Url] = SourceValue("", Url.empty()),
-        top_url: Url = Url.empty(),
-        form_url: Url = Url.empty()
     ) -> "Company":
         return cls(
             name=name,
@@ -35,6 +31,4 @@ class Company:
             representative=representative,
             capital=capital,
             employees=employees,
-            top_url=top_url,
-            form_url=form_url
         )
