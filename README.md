@@ -1,4 +1,4 @@
-# 企業情報自動クローラー（スクレイピングツール）
+# 会社概要クローラー（スクレイピングツール）
 
 [![CI](https://github.com/takahashi-keisuke-b/scraping_company_info/actions/workflows/CI.yml/badge.svg)](https://github.com/takahashi-keisuke-b/scraping_company_info/actions/workflows/CI.yml)
 
