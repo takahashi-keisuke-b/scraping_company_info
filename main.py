@@ -6,7 +6,7 @@ from usecase.CrawlCompanyUseCase import CrawlCompanyUseCase
 from view.streamlit_component import StreamlitComponent
 
 def main() -> None:
-    st.title("企業情報クローラー")
+    st.title("会社概要クローラー")
     st.text("企業サイトのURLを入力してください")
 
     raw_url: str = st.text_input(
@@ -29,14 +29,14 @@ def main() -> None:
                 company: Company = result_company.value
                 print(f"Success| company: {company}")
 
-                st.success("企業情報の取得に成功しました")
+                st.success("会社概要の取得に成功しました")
 
                 ui = StreamlitComponent
                 ui.display_company(company)
 
             else:
                 print(f"Fail: not found")
-                st.error("情報取得に失敗、または対象のデータが見つかりませんでした")
+                st.error("会社概要の取得に失敗、または対象のページが見つかりませんでした")
         
         except ValueError as e:
             print(f"Error: {e}")
