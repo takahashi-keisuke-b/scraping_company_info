@@ -42,4 +42,27 @@ http://example.com
 - **requests** (v2.32.2): HTTPクライアント（WebページのHTML取得およびセッション管理）
 - **beautifulsoup4** (v4.12.3): HTMLの解析
 
+## アーキテクチャ
+```mermaid
+flowchart TB
+    %% ノードの定義（役割がわかりやすいように名前と解説を付与）
+    A[🧑‍💻 User] 
+    B[🎨 View / Streamlit UI] 
+    C[🕹️ Controller] 
+    D[⚙️ UseCase / 巡回制御] 
+    E[🔌 WebClient / HTML Mapper] 
+    F[🌐 Target Web]
+
+    %% データの流れ（双方向のやり取り）
+    A <-->|操作 / 結果表示| B
+    B <-->|イベント / 状態反映| C
+    C <-->|処理要求 / ドメインモデル| D
+    D <-->|通信・パース要求 / 抽出データ| E
+    E <-->|HTTPリクエスト / レスポンス| F
+
+    %% スタイルの調整（見やすさのための色分け）
+    style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style D fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+    style F fill:#efebe9,stroke:#4e342e,stroke-width:2px
+```
 
