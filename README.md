@@ -66,3 +66,30 @@ flowchart TB
     style F fill:#efebe9,stroke:#4e342e,stroke-width:2px
 ```
 
+## セットアップと実行手順
+### 前提条件
+- Python: 3.12.x
+- パッケージ管理ツール: `Conda` or `pip`
+
+### セットアップ
+```bash
+
+# リポジトリのクローン
+git clone https://github.com/takahashi-keisuke-b/scraping_company_info.git
+cd scraping_company_info
+
+# 環境構築とライブラリのインストール
+# A. Conda（推奨）
+conda create -n company_crawler python=3.12.4 -y
+conda activate company_crawler
+pip install streamlit==1.58.0 beautifulsoup4==4.12.3 requests==2.32.2
+
+# B. pip
+python -m venv .venv
+pip install streamlit==1.58.0 beautifulsoup4==4.12.3 requests==2.32.2
+
+# 起動
+streamlit run main.py
+```
+
+
