@@ -5,7 +5,7 @@
 ターゲットとなる企業サイトのURLを入力するだけで、サイト内を自律的に巡回（クローリング）し、会社概要ページから自動で企業情報を抽出するPythonアプリケーションです。
 
 **URL**:
-http://example.com
+https://scrapingcompanyinfo-ipqplmvczhxklfjssityt9.streamlit.app/
 
 ---
 ## 概要
